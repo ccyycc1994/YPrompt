@@ -689,7 +689,10 @@ const handleCopyPrompt = async () => {
 const handlePractice = () => {
   router.push({
     path: '/playground',
-    query: { promptId: prompt.value.id }
+    query: { 
+      promptId: prompt.value.id,
+      from: 'community'  // 标识来自社区广场
+    }
   })
 }
 

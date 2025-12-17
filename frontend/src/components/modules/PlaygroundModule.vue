@@ -276,15 +276,38 @@ const loadPromptForPlayground = async (promptId: number) => {
   if (!promptId) return
   try {
     const token = localStorage.getItem('yprompt_token')
-    if (!token) {
-      throw new Error('请先登录')
-    }
-    const response = await fetch(`${API_BASE_URL}/api/prompts/${promptId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const fromCommunity = route.query.from === 'community'
+    
+    // 优先尝试公开API（社区提示词），如果失败再尝试私有API（用户自己的提示词）
+    let response: Response
+    let result: any
+    
+    if (fromCommunity) {
+      // 从社区来的，直接使用公开API
+      const headers: Record<string, string> = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
       }
-    })
-    const result = await response.json()
+      response = await fetch(`${API_BASE_URL}/api/community/prompts/${promptId}`, { headers })
+      result = await response.json()
+    } else {
+      // 先尝试公开API（支持可选认证）
+      const headers: Record<string, string> = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      response = await fetch(`${API_BASE_URL}/api/community/prompts/${promptId}`, { headers })
+      result = await response.json()
+      
+      // 如果公开API返回404，且用户已登录，尝试私有API
+      if (result.code === 404 && token) {
+        response = await fetch(`${API_BASE_URL}/api/prompts/${promptId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        result = await response.json()
+      }
+    }
+    
     if (result.code !== 200) {
       throw new Error(result.message || '加载失败')
     }
