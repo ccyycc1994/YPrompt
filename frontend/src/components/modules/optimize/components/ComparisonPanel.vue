@@ -982,31 +982,31 @@ onMounted(() => {
 // 系统提示词模式：发送消息
 const handleSendSystemMessage = async () => {
   if (!sharedInput.value.trim()) return
-  
+  const attachments = [...sharedAttachments.value]
   comparison.state.systemConfig.sharedUserInput = sharedInput.value
-  await comparison.sendSystemMessage(sharedAttachments.value)
   sharedInput.value = ''
   sharedAttachments.value = []
+  await comparison.sendSystemMessage(attachments)
 }
 
 // 用户提示词模式：发送左侧消息
 const handleSendLeftMessage = async () => {
   if (!leftInput.value.trim()) return
-  
+  const attachments = [...leftAttachments.value]
   comparison.state.userConfig.leftUserPrompt = leftInput.value
-  await comparison.sendLeftUserMessage(leftAttachments.value)
   leftInput.value = ''
   leftAttachments.value = []
+  await comparison.sendLeftUserMessage(attachments)
 }
 
 // 用户提示词模式：发送右侧消息
 const handleSendRightMessage = async () => {
   if (!rightInput.value.trim()) return
-  
+  const attachments = [...rightAttachments.value]
   comparison.state.userConfig.rightUserPrompt = rightInput.value
-  await comparison.sendRightUserMessage(rightAttachments.value)
   rightInput.value = ''
   rightAttachments.value = []
+  await comparison.sendRightUserMessage(attachments)
 }
 
 // 清空左侧对话
